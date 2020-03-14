@@ -10,6 +10,7 @@ services:
             - ./sphinx-data:/var/lib/sphinx/data
             - ./sphinx.conf:/opt/sphinx/conf/sphinx.conf
             - ./sphinx-logs:/var/log/sphinx
+        entrypoint: sh -c "mkdir -p /usr/local/var/data && touch /usr/local/var/data/binlog.lock && searchd -c /opt/sphinx/conf/sphinx.conf --nodetach"
         depends_on: 
             - mysql
     mysql:
@@ -22,5 +23,5 @@ services:
             MYSQL_ROOT_PASSWORD: root
         volumes:
             - ./mysql-data:/var/lib/mysql
-            - ./mysql-scripts:/scripts
+            - .mysql-scripts:/scripts
             - ./datasets:/datasets

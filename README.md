@@ -11,3 +11,11 @@
 ## Index dataset
 
 `docker-compose run sphinx sh -c "indexer -c /opt/sphinx/conf/sphinx.conf --all"`
+
+## Query sphinx
+
+`docker-compose exec mysql mysql -h sphinx -P 9306`
+
+### Examples
+
+`SELECT id, score FROM test WHERE MATCH('exception') ORDER BY score DESC;`
