@@ -4,18 +4,17 @@
 
 `docker-compose up -d`
 
-## Load dataset
-
-`docker-compose exec mysql bash -c "mysql -proot stackoverflow < /scripts/load-dataset.sql"`
-
 ## Index dataset
 
-`docker-compose run sphinx sh -c "indexer -c /opt/sphinx/conf/sphinx.conf --all"`
+`docker-compose run python bash -c "pip install PyMySQL && python /scripts/load-jsons.py"`
 
 ## Query sphinx
 
 `docker-compose exec mysql mysql -h sphinx -P 9306`
 
-### Examples
+## Example queries
 
-`SELECT id, score FROM test WHERE MATCH('exception') ORDER BY score DESC;`
+```sql
+SELECT j.id, j.title, weight() FROM doj WHERE MATCH('@(title) toyota');
+SELECT j.id, j.components, j.title, IN(j.components, 'Antitrust Division') AS ad, weight() FROM doj WHERE MATCH('toyota') AND ad = 1;
+```

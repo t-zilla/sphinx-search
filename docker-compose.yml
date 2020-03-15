@@ -4,24 +4,25 @@ services:
     sphinx:
         image: macbre/sphinxsearch:3.1.1
         ports:
-            - 9312:9312
             - 9306:9306
         volumes:
             - ./sphinx-data:/var/lib/sphinx/data
             - ./sphinx.conf:/opt/sphinx/conf/sphinx.conf
             - ./sphinx-logs:/var/log/sphinx
         entrypoint: sh -c "mkdir -p /usr/local/var/data && touch /usr/local/var/data/binlog.lock && searchd -c /opt/sphinx/conf/sphinx.conf --nodetach"
+    python:
+        image: python:3.6
+        volumes:
+            - ./python-scripts:/scripts
+            - ./datasets:/datasets
         depends_on: 
-            - mysql
+            - sphinx
     mysql:
         image: mysql:5.6
-        expose:
-            - 3306
         restart: always
         environment:
-            MYSQL_DATABASE: stackoverflow
-            MYSQL_ROOT_PASSWORD: root
+            MYSQL_ALLOW_EMPTY_PASSWORD: 1
         volumes:
             - ./mysql-data:/var/lib/mysql
-            - .mysql-scripts:/scripts
-            - ./datasets:/datasets
+        depends_on: 
+            - sphinx
