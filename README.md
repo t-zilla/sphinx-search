@@ -2,42 +2,43 @@
 
 ## Quick start
 
+1. Move dataset to `datasets/plwiki.json`
+2. Start containers \
 `docker-compose up -d`
+3. Install python dependencies \
 `docker-compose run python bash -c "pip install PyMySQL"`
-
-## Index dataset
-
+4. Index data \
 `docker-compose run python bash -c "python /scripts/load-jsons.py"`
 
 ## Query sphinx
 
-`docker-compose exec mysql mysql -h sphinx -P 9306`
+```bash
+docker-compose exec mysql mysql -h sphinx -P 9306
+```
 
 ## Example queries
 
 ```sql
-SELECT j.id, j.title, weight() FROM doj WHERE MATCH('@(title) toyota');
-```
-
-```sql
-SELECT j.id, j.components, j.title, IN(j.components, 'Antitrust Division') AS ad, weight() FROM doj WHERE MATCH('toyota') AND ad = 1;
+SELECT j.id, j.title, weight()
+FROM plwiki
+WHERE MATCH('@(text) python');
 ```
 
 ```sql
 SELECT
-    j.components,
     j.title,
-    IN(j.components, 'Office of Public Affairs') + IN(j.components, 'Office of the Attorney General') AS ad,
+    j.datetime,
     weight()
-FROM doj
+FROM plwiki
 WHERE
-    MATCH('@(contents) WASHINGTON && @(title) Justice') AND
-    ad > 0 AND
-    j.date BETWEEN 1233442800 AND 1235862000
-ORDER BY j.contents DESC, j.title DESC
+    MATCH('@(text) hybrydowy && @(title) toyota') AND
+    j.datetime BETWEEN 1514764800 AND 1585440000
+ORDER BY j.datetime DESC, j.title DESC
 LIMIT 0,10;
 ```
 
 ## Perf test
 
-`docker-compose run python bash -c "python /scripts/test.py"`
+```bash
+docker-compose run python bash -c "python /scripts/run-multiple.py"
+```
